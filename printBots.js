@@ -22,8 +22,7 @@ rl.on('line', function(line) {
 });
 
 rl.on('close', function() {
-  console.log('Top writers: ');
   console.log(
-    Array.from(counts).sort((a, b) => b[1] - a[1]).slice(0, 100).map(x => x[0] + ' - ' + x[1]).join('\n')
+    JSON.stringify(Array.from(counts).sort((a, b) => b[1] - a[1]).slice(0, 100).map(x => x[0]))
   );
 });
