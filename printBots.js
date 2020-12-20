@@ -5,7 +5,6 @@
  * 
  *   cat sorted.txt | node printTopCotributors.js
  */
-const path = require('path');
 const readline = require('readline');
 
 let counts = new Map();
