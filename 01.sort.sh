@@ -1,2 +1,2 @@
 #!/bin/bash
-LC_ALL=C sort -u ./data/* > sorted.txt
+LC_ALL=C sort -u ./temp/* > sorted.txt
