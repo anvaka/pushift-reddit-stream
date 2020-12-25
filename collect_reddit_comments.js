@@ -25,14 +25,13 @@ function startTheCrawl() {
   }
   startFrom += 100;
 
-  let thingsToFetch = queue.map(x => 't1_' + x.toString('36')).join(',');
+  let thingsToFetch = queue.map(x => 't1_' + x.toString(36)).join(',');
   fetch('https://www.reddit.com/api/info.json?id=' + thingsToFetch + '&access_token=' + access_token, {
     'User-Agent': userAgent
   }).then(x => {
     if (x.headers.get('X-Ratelimit-Reset') !== undefined) {
       forceReset = Number.parseInt(x.headers.get('X-Ratelimit-Reset'), 10) * 1000;
     }
-    // console.warn(x.headers);
     return x.json();
   }).then(x => {
     let comments = x.data.children;
@@ -40,13 +39,13 @@ function startTheCrawl() {
     let message = 'Now is: ' + (new Date()).toISOString() + '; Start from: ' + startFrom + '. Last processeed date: ' + getCommentDate(comments[comments.length - 1].data);
     console.log(message);
     console.warn(message);
-    // per reddit's rule they ask to do up to 60 requests per minute: 
+    // Respect reddit's quota rules:
     // https://github.com/reddit-archive/reddit/wiki/API#rules
     if (forceReset) {
       console.warn('Waiting for quota reset at ' + forceReset);
-      setTimeout(startTheCrawl, forceReset); // forceReset || 60 * 1000/60); 
+      setTimeout(startTheCrawl, forceReset);
     } else {
-      setTimeout(startTheCrawl, 0); // forceReset || 60 * 1000/60); 
+      setTimeout(startTheCrawl, 0); 
     }
   })
 }
