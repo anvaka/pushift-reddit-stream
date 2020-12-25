@@ -6,7 +6,7 @@ const resourceManger = new ResourceManager();
 const outFolder = process.argv[2] || './';
 const path = require('path');
 
-let startFrom = Number.parseInt('fptplco', 32);
+let startFrom = 34213292376; // Number.parseInt('fptplco', 36);
 
 let access_token;
 if (!REDDIT_CLIENT_ID || !REDDIT_CLIENT_SECRET) {
@@ -25,22 +25,29 @@ function startTheCrawl() {
   }
   startFrom += 100;
 
-  let thingsToFetch = queue.map(x => 't1_' + x.toString('32')).join(',');
+  let thingsToFetch = queue.map(x => 't1_' + x.toString('36')).join(',');
   fetch('https://www.reddit.com/api/info.json?id=' + thingsToFetch + '&access_token=' + access_token, {
     'User-Agent': userAgent
   }).then(x => {
-    if (x.headers['X-Ratelimit-Reset'] !== undefined) {
-      forceReset = Number.parseInt(x.headers['X-Ratelimit-Reset'], 10) * 1000;
+    if (x.headers.get('X-Ratelimit-Reset') !== undefined) {
+      forceReset = Number.parseInt(x.headers.get('X-Ratelimit-Reset'), 10) * 1000;
     }
-    console.warn(x.headers);
+    // console.warn(x.headers);
     return x.json();
   }).then(x => {
     let comments = x.data.children;
     comments.forEach(child => processComment(child.data));
-    console.log('Start from: ' + startFrom + '. Date: ' + getCommentDate(comments[comments.length - 1].data));
+    let message = 'Now is: ' + (new Date()).toISOString() + '; Start from: ' + startFrom + '. Last processeed date: ' + getCommentDate(comments[comments.length - 1].data);
+    console.log(message);
+    console.warn(message);
     // per reddit's rule they ask to do up to 60 requests per minute: 
     // https://github.com/reddit-archive/reddit/wiki/API#rules
-    setTimeout(startTheCrawl, forceReset || 60 * 1000/60); 
+    if (forceReset) {
+      console.warn('Waiting for quota reset at ' + forceReset);
+      setTimeout(startTheCrawl, forceReset); // forceReset || 60 * 1000/60); 
+    } else {
+      setTimeout(startTheCrawl, 0); // forceReset || 60 * 1000/60); 
+    }
   })
 }
 
