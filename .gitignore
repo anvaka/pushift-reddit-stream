@@ -2,3 +2,5 @@ temp
 bots.json
 sorted.txt
 filtered.txt
+backfill
+node_modules
