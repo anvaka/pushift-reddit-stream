@@ -6,7 +6,8 @@ const resourceManger = new ResourceManager();
 const outFolder = process.argv[2] || './';
 const path = require('path');
 
-let startFrom = 34213292376; // Number.parseInt('fptplco', 36);
+//let startFrom = 34213292376; // Number.parseInt('fptplco', 36);
+let startFrom = 34223677476; // Number.parseInt('fptplco', 36);
 
 let access_token;
 if (!REDDIT_CLIENT_ID || !REDDIT_CLIENT_SECRET) {
@@ -34,11 +35,24 @@ function startTheCrawl() {
     }
     return x.json();
   }).then(x => {
+    if (!x.data) {
+      console.error('No data for ', x);
+      throw new Error('Missig data');
+    }
     let comments = x.data.children;
     comments.forEach(child => processComment(child.data));
-    let message = 'Now is: ' + (new Date()).toISOString() + '; Start from: ' + startFrom + '. Last processeed date: ' + getCommentDate(comments[comments.length - 1].data);
-    console.log(message);
-    console.warn(message);
+    if (comments.length === 0) {
+      console.warn('Empty response at ' + startFrom)
+    } else {
+      const lastComment = comments[comments.length - 1];
+      if (!lastComment) {
+        console.error('Missing comment?', comments, x);
+        throw new Error('no comment');
+      }
+      let message = 'Now is: ' + (new Date()).toISOString() + '; Start from: ' + startFrom + '. Last processeed date: ' + getCommentDate(lastComment.data);
+      console.log(message);
+      console.warn(message);
+    }
     // Respect reddit's quota rules:
     // https://github.com/reddit-archive/reddit/wiki/API#rules
     if (forceReset) {
