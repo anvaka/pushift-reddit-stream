@@ -3,4 +3,5 @@ bots.json
 sorted.txt
 filtered.txt
 backfill
+*.log
 node_modules
