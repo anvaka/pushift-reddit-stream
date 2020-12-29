@@ -7,7 +7,8 @@ const outFolder = process.argv[2] || './';
 const path = require('path');
 
 //let startFrom = 34213292376; // Number.parseInt('fptplco', 36);
-let startFrom = 34223677476; // Number.parseInt('fptplco', 36);
+let startFrom = 34233588776; // Number.parseInt('fptplco', 36);
+const IDS_PER_CALL = 100;
 
 let access_token;
 if (!REDDIT_CLIENT_ID || !REDDIT_CLIENT_SECRET) {
@@ -21,10 +22,9 @@ initAuthToken().then(startTheCrawl);
 function startTheCrawl() {
   let queue = [];
   let forceReset;
-  for (let i = 0; i < 100; ++i) {
+  for (let i = 0; i < IDS_PER_CALL; ++i) {
     queue.push(startFrom + i);
   }
-  startFrom += 100;
 
   let thingsToFetch = queue.map(x => 't1_' + x.toString(36)).join(',');
   fetch('https://www.reddit.com/api/info.json?id=' + thingsToFetch + '&access_token=' + access_token, {
@@ -33,12 +33,26 @@ function startTheCrawl() {
     if (x.headers.get('X-Ratelimit-Reset') !== undefined) {
       forceReset = Number.parseInt(x.headers.get('X-Ratelimit-Reset'), 10) * 1000;
     }
-    return x.json();
-  }).then(x => {
+    return x.text();
+  }).then(txt => {
+    let x;
+    try {
+      x = JSON.parse(txt);
+    } catch (e) {
+      console.error('Failed to parse ' + txt);
+      if (txt.match(/we took too long/) || txt.match(/try again in a minute/)) {
+        console.error('Retrying in a minute...');
+        setTimeout(startTheCrawl, 60 * 1000);
+        return;
+      }
+      console.error('Cannot recover from this.')
+      throw e;
+    }
     if (!x.data) {
       console.error('No data for ', x);
       throw new Error('Missig data');
     }
+    startFrom += IDS_PER_CALL;
     let comments = x.data.children;
     comments.forEach(child => processComment(child.data));
     if (comments.length === 0) {
