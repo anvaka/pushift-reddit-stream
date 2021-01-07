@@ -4,9 +4,11 @@ const outFolder = process.argv[2] || './';
 const path = require('path');
 
 //let startFrom = 34213292376; // Number.parseInt('fptplco', 36);
-let startFrom = 34233588776;
+let startFrom = 34302560776;//34233588776;
 const IDS_PER_CALL = 100;
 
+
+const redditClient = require('./lib/redditClient');
 startTheCrawl();
 
 function startTheCrawl() {
@@ -16,14 +18,16 @@ function startTheCrawl() {
     idsToFetch.push(startFrom + i);
   }
 
-  redditClient.getInfo(queue).then(response => {
+  redditClient.getCommentsInfo(idsToFetch).then(response => {
     startFrom += IDS_PER_CALL;
     response.comments.forEach(processComment);
-    setTimeout(startTheCrawl, response.waitTillNextCall);
 
-    const message = 'Now is: ' + (new Date()).toISOString() + '; Start from: ' + startFrom + '. Last processeed date: ' + getCommentDate(lastComment.data);
+    let lastComment = response.comments[response.comments.length - 1];
+
+    const message = 'Now is: ' + (new Date()).toISOString() + '; Start from: ' + startFrom + '. Last processeed date: ' + getCommentDate(lastComment);
     console.log(message);
     console.warn(message);
+    setTimeout(startTheCrawl, response.waitTillNextCall);
   });
 }
 
