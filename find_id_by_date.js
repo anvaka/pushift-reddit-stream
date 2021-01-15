@@ -17,8 +17,8 @@ const firstPost = {
 }
 
 const lastPost = {
-  date: new Date('2020-12-31T18:39:05.000Z'),
-  id: Number.parseInt('ghmnxo7', 36)
+  date: new Date('2021-01-14T07:13:54.000Z'),
+  id: Number.parseInt('gj7fs0a', 36)
 }
 
 if (startDate < firstPost.date) {
