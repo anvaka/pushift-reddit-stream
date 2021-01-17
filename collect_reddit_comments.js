@@ -1,7 +1,23 @@
+/**
+ * This script constantly collect new pairs of 'user,subreddit'.
+ * You pass it a single text file that describes the required work.
+ * For example, such file could be called `december.txt`, and its content
+ * is just one line:
+ * 
+ * december 35707973867 35714381239
+ * 
+ * The first item is the data folder where results should be written (december above)
+ * The second item is the bottom range of remaining work, comment id: 35707973867
+ * The third item is the top range of the work, comment id  (35714381239
+ * 
+ * As script progresses it will constantly update the second item with the last
+ * point where it should be resumed (in case if it is interrupted). The files in
+ * the data folder will be called as YYYY-mm-dd format. If such files already exist
+ * they new records are appended to the end.
+ */
 const fs = require('fs');
 const ResourceManager = require('./ResourceManager');
 const resourceManger = new ResourceManager();
-// const outFolder = process.argv[2] || './';
 const path = require('path');
 
 const IDS_PER_CALL = 100;
@@ -10,13 +26,12 @@ let inputFileName = process.argv[2];
 if (!fs.existsSync(inputFileName)) {
   console.error('Pass a file name where start end rage are defined')
   console.error('This will collect all comments for the day of Dec 4, 2020 and store into "backfill" folder')
-  console.error('  echo 35707973867 35714381239 > december.txt')
-  console.error('  node collect_reddit_comments.js backfill december.txt')
+  console.error('  echo december 35707973867 35714381239 > december.txt')
+  console.error('  node collect_reddit_comments.js december.txt')
   process.exit(0);
 }
 
 let input = fs.readFileSync(inputFileName, 'utf8').split(' ');
-// .map(x => Number.parseFloat(x)).filter(x => Number.isFinite(x));
 if (input.length !== 3) {
   console.error('Could not parse the input file - values should be: `out_folder startFrom endAt`. E.g.:')
   console.error('  echo december 35707973867 35714381239 > december.txt')
