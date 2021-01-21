@@ -4,7 +4,7 @@
  *
  *
  * Usage:
- *   cat sorted.txt | node filter > filtered.txt
+ *   cat sorted.txt | node filter_users > filtered.txt
  */
 const readline = require('readline');
 const filteredUsers = new Set(require('./bots.json'))

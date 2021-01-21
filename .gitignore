@@ -1,8 +1,11 @@
 temp
 bots.json
+small_subreddits.json
+large_subreddits.json
 sorted.txt
 filtered.txt
 backfill
 *.log
 *.txt
+*.gz
 node_modules
