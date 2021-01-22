@@ -81,16 +81,19 @@ function startTheCrawl() {
 
   redditClient.getCommentsInfo(idsToFetch).then(response => {
     startFrom += IDS_PER_CALL;
-    response.comments.forEach(processComment);
+    if (response) {
+      response.comments.forEach(processComment);
 
-    let lastComment = response.comments[response.comments.length - 1];
+      let lastComment = response.comments[response.comments.length - 1];
 
-    const message = (new Date()).toISOString() + ' Start from: ' + startFrom + '. Last processeed date: ' + getCommentDate(lastComment) + 
-    ' wait: ' + response.waitTillNextCall;
-    console.log(message);
-    // console.warn(message);
+      const message = (new Date()).toISOString() + ' Start from: ' + startFrom + '. Last processeed date: ' + getCommentDate(lastComment) + 
+      ' wait: ' + response.waitTillNextCall;
+      console.log(message);
+    } else {
+      console.log('Warning: Empty response from ' + idsToFetch.join(','));
+    }
     fs.writeFileSync(inputFileName, `${outFolder} ${startFrom} ${endAt}`, 'utf8')
-    setTimeout(startTheCrawl, response.waitTillNextCall);
+    setTimeout(startTheCrawl, (response && response.waitTillNextCall) || 0);
   });
 }
 
