@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "for-each-line": "^1.0.0"
+    "for-each-line": "^1.0.0",
+    "node-fetch": "^2.6.1"
   }
 }
