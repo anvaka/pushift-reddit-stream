@@ -32,6 +32,8 @@ function startTheCrawl() {
     } else {
       console.warn('Warning: Empty response from ' + idsToFetch.join(','));
     }
-    setTimeout(startTheCrawl, (response && response.waitTillNextCall) || 0);
+    const waitTillNextCall = (response && response.waitTillNextCall) || 0;
+    console.warn('Waiting ', waitTillNextCall);
+    setTimeout(startTheCrawl, waitTillNextCall);
   });
 }
